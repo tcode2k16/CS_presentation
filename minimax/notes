@@ -1,0 +1,2 @@
+start a server:
+  python -m SimpleHTTPServer
