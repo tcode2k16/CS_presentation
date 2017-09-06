@@ -1,4 +1,5 @@
 // slideshow @ https://slides.com/alanchang/minimax/live#/
+// live demo @ https://tcode2k16.github.io/CS_presentation/minimax/index.html
 
 const BOT = O;
 const PLAYER = X;
