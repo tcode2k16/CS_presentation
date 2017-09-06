@@ -1,3 +1,5 @@
+// slideshow @ https://slides.com/alanchang/minimax/live#/
+
 const BOT = O;
 const PLAYER = X;
 
