@@ -3,22 +3,22 @@ const XElement = `
   <path d="M16,16L112,112" style="stroke: rgb(84, 84, 84);"></path>
   <path d="M112,16L16,112" style="stroke: rgb(84, 84, 84);"></path>
 </svg>
-`
+`;
 
 const OElement = `
 <svg class="o" aria-label="O" role="img" viewBox="0 0 128 128" style="visibility: visible;">
   <path d="M64,16A48,48 0 1,0 64,112A48,48 0 1,0 64,16" style="stroke: rgb(242, 235, 211);"></path>
 </svg>
-`
+`;
 
-const EMPTY = 0
-const X = 1
-const O = 2
-const DRAW = 3
-let bot = null
+const EMPTY = 0;
+const X = 1;
+const O = 2;
+const DRAW = 3;
+let bot = null;
 
-let els = []
-let textEl = null
+let els = [];
+let textEl = null;
 
 function clone(d) {
   let out, v, key;
@@ -51,28 +51,31 @@ const game = {
   },
 
   init() {
-    textEl = document.getElementsByClassName('text')[0]
-    els = document.getElementsByClassName('item')
+    textEl = document.getElementsByClassName('text')[0];
+    els = document.getElementsByClassName('item');
     Array.prototype.map.call(els, function (e, i) {
-      e.onclick = this._clickFuncFactory(i)
-    }.bind(this))
+      e.onclick = this._clickFuncFactory(i);
+    }.bind(this));
   },
 
-  setBlock(state, {x, y}) {
-    let new_state = clone(state)
-    new_state.grid[x][y] = new_state.turn
-    this._switchTurns(new_state)
-    return new_state
+  setBlock({grid, turn}, {x, y}) {
+    let new_state = {
+      grid: grid.map(e => e.slice(0)),
+      turn
+    };
+    new_state.grid[x][y] = turn;
+    this._switchTurns(new_state);
+    return new_state;
   },
 
   getMoves(grid) {
-    let moves = []
+    let moves = [];
     grid.forEach((e, row) => {
       e.forEach((i, col) => {
-        if (i === EMPTY) moves.push({ x:row, y:col })
-      })
-    })
-    return moves
+        if (i === EMPTY) moves.push({ x:row, y:col });
+      });
+    });
+    return moves;
   },
 
   getWinner(grid) {
@@ -80,77 +83,77 @@ const game = {
               .join('')
               .split(X).join('X')
               .split(O).join('O')
-              .split(EMPTY).join('.')
+              .split(EMPTY).join('.');
 
-    let r = str.match(/(\w)(..(\1|.\1.)..\1|.\1.\1..$|\1\1(...)*$)/g)
+    let r = str.match(/(\w)(..(\1|.\1.)..\1|.\1.\1..$|\1\1(...)*$)/g);
     if (!r) {
-      let isFull = str.indexOf('.') < 0
+      let isFull = str.indexOf('.') < 0;
       
       if (isFull)
         return DRAW;
       
       return EMPTY;
     }
-    r = r[0].charAt(0)
-    return r === 'X' ? X : O
+    r = r[0].charAt(0);
+    return r === 'X' ? X : O;
   },
 
   userClick({x, y}) {
-    this.state = this.setBlock(this.state, { x, y })
-    this._render()
-    let winner = this.getWinner(this.state.grid)
+    this.state = this.setBlock(this.state, { x, y });
+    this._render();
+    let winner = this.getWinner(this.state.grid);
     if (winner !== EMPTY) {
-      this._endGame(winner)
+      this._endGame(winner);
       return;
     }
   },
   
   _switchTurns(state) {
-    state.turn = state.turn === X ? O : X
+    state.turn = state.turn === X ? O : X;
   },
 
   _endGame(winner) {
     setTimeout(() => {
-      let containerEl = document.getElementsByClassName('container')[0]
-      let endGameEl = document.getElementsByClassName('endGame')[0]
-      containerEl.style.display = 'none'
-      textEl.innerHTML = 'Game Over'
+      let containerEl = document.getElementsByClassName('container')[0];
+      let endGameEl = document.getElementsByClassName('endGame')[0];
+      containerEl.style.display = 'none';
+      textEl.innerHTML = 'Game Over';
       
       if (winner !== DRAW)
-        endGameEl.innerHTML = (winner === X ? XElement : OElement) + endGameEl.innerHTML
+        endGameEl.innerHTML = (winner === X ? XElement : OElement) + endGameEl.innerHTML;
       else
-        document.getElementsByClassName('title')[0].innerHTML = 'DRAW!'
+        document.getElementsByClassName('title')[0].innerHTML = 'DRAW!';
       
-      endGameEl.style.display = 'flex'
-    }, 500)
+      endGameEl.style.display = 'flex';
+    }, 500);
   
   },
 
   _render() {
     this.state.grid.forEach((e, row) => {
       e.forEach((i, col) => {
-        let content = ''
+        let content = '';
         switch(this.state.grid[row][col]) {
           case X: content = XElement; break;
           case O: content = OElement; break;
           default: break;
         }
-        els[row*3+col].innerHTML = content
+        els[row*3+col].innerHTML = content;
       })
     })
-    textEl.innerHTML = (this.state.turn === X ? 'X' : 'O') + ' Turn'
+    textEl.innerHTML = (this.state.turn === X ? 'X' : 'O') + ' Turn';
   },
 
   _clickFuncFactory(count) {
-    let y = count % 3
-    let x = (count - y) / 3
+    let y = count % 3;
+    let x = (count - y) / 3;
     return (function() {
       if (this.state.grid[x][y] === EMPTY) {
-        this.userClick({x, y})
-        if (bot) bot(JSON.parse(JSON.stringify(this.state)))
+        this.userClick({x, y});
+        if (bot) bot(JSON.parse(JSON.stringify(this.state)));
       }
-    }).bind(this)
+    }).bind(this);
   }
 }
 
-window.onload = game.init.bind(game)
+window.onload = game.init.bind(game);
